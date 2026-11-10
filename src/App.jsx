@@ -1,4 +1,10 @@
+import SearchForm from './components/SearchForm.jsx'
+
 function App() {
+  const handleSearch = (number) => {
+    console.info(`Ищем производителя по артикулу «${number}»`)
+  }
+
   return (
     <>
       <header className="app-header">
@@ -32,21 +38,8 @@ function App() {
                 складах.
               </p>
 
-              {/* Заглушка формы — заменится компонентом SearchForm на шаге 2 */}
-              <div className="search-placeholder input-group input-group-lg mb-3">
-                <span className="input-group-text bg-white">
-                  <i className="bi bi-upc-scan text-muted" />
-                </span>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Например, 0189 или W712/73"
-                />
-                <button type="button" className="btn btn-dark">
-                  <i className="bi bi-search me-2" />
-                  Найти
-                </button>
-              </div>
+              {/* Форма поиска */}
+              <SearchForm onSearch={handleSearch} />
 
               <div className="stepper d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 mt-4 pt-2">
                 <div className="d-flex align-items-center gap-3">

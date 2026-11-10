@@ -1,5 +1,3 @@
-/* Минимальные стили каркаса страницы (шаг 1) — позже расширим на шаге 14 */
-
 body {
   min-height: 100svh;
   background-color: #eef0f4;
@@ -11,7 +9,6 @@ body {
   flex-direction: column;
 }
 
-/* Шапка */
 .app-header {
   background-color: #132437;
   color: #fff;
@@ -49,7 +46,6 @@ body {
   opacity: 0.65;
 }
 
-/* Герой-блок */
 .hero-panel {
   background-color: #fff;
   border-radius: 1rem;
@@ -70,14 +66,12 @@ body {
   max-width: 40rem;
 }
 
-/* От 576 px и выше группа всегда в одну строку, независимо от ширины */
 @media (min-width: 576px) {
   .search-placeholder {
     flex-wrap: nowrap;
   }
 }
 
-/* Кнопка «Найти»: курсор и фон при наведении */
 .search-placeholder .btn {
   cursor: pointer;
 }
@@ -88,27 +82,20 @@ body {
   color: #132437;
 }
 
-/* Мягкое свечение поля при фокусе */
 .search-placeholder .form-control:focus {
   box-shadow: 0 0 0 0.1rem rgba(13, 110, 253, 0.25);
 }
 
-/* Мобильная раскладка формы (< 576 px): иконка указателя + поле занимают
-   строку, кнопка уходит на отдельную строку на всю ширину.
-   От 576 px и выше — обычная однострочная input-group. */
 @media (max-width: 575.98px) {
   .search-placeholder {
     flex-wrap: wrap;
     row-gap: 0.5rem;
   }
 
-  /* Мельче шрифт поля (и плейсхолдера наследует от него) */
   .search-placeholder .form-control {
     font-size: 1rem;
   }
 
-  /* Bootstrap срезает радиусы у «средних» и «первого» детей группы
-     (специфичность :not-chain выше наших классов) — возвращаем их явно */
   .search-placeholder .form-control {
     border-top-right-radius: var(--bs-border-radius-lg) !important;
     border-bottom-right-radius: var(--bs-border-radius-lg) !important;
@@ -124,7 +111,30 @@ body {
   }
 }
 
-/* Степпер в герой-блоке */
+.search-examples {
+  color: #8a97a5;
+  font-size: 0.95rem;
+}
+
+.chip {
+  border: 1px solid #e2e6ec;
+  border-radius: 2rem;
+  background-color: #fff;
+  color: #3f4a56;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.chip:hover {
+  border-color: #ffc107;
+  color: #132437;
+}
+
 .stepper-num {
   display: inline-flex;
   align-items: center;
@@ -149,7 +159,6 @@ body {
   background-color: #d8dce3;
 }
 
-/* Карточки шагов под герой-блоком: ширина совпадает с hero-panel */
 .steps-inner {
   max-width: 60rem;
   margin: 0 auto;
@@ -191,7 +200,6 @@ body {
   color: #6b7885;
 }
 
-/* 768–991 px: иконка над текстом, чтобы оставаться компактными */
 @media (min-width: 768px) and (max-width: 991.98px) {
   .step-row {
     flex-direction: column;
@@ -199,7 +207,6 @@ body {
   }
 }
 
-/* Подвал */
 .app-footer {
   background-color: #fff;
   border-top: 1px solid #e5e8ee;
