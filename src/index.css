@@ -1,109 +1,206 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
-  --heading: system-ui, "Segoe UI", Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
+/* Минимальные стили каркаса страницы (шаг 1) — позже расширим на шаге 14 */
 
 body {
-  margin: 0;
+  min-height: 100svh;
+  background-color: #eef0f4;
 }
 
 #root {
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+/* Шапка */
+.app-header {
+  background-color: #132437;
+  color: #fff;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
+.brand-icon {
   display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background-color: #ffc107;
+  color: #132437;
+  font-size: 1.35rem;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.brand-name {
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.brand-tagline {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+/* Герой-блок */
+.hero-panel {
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(19, 36, 55, 0.08);
+  max-width: 60rem;
+  margin: 0 auto;
+}
+
+.hero-badge {
+  background-color: #fff6df;
+  color: #8a6a00;
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 0.55em 0.9em;
+}
+
+.search-placeholder {
+  max-width: 40rem;
+}
+
+/* От 576 px и выше группа всегда в одну строку, независимо от ширины */
+@media (min-width: 576px) {
+  .search-placeholder {
+    flex-wrap: nowrap;
+  }
+}
+
+/* Кнопка «Найти»: курсор и фон при наведении */
+.search-placeholder .btn {
+  cursor: pointer;
+}
+
+.search-placeholder .btn:hover {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #132437;
+}
+
+/* Мягкое свечение поля при фокусе */
+.search-placeholder .form-control:focus {
+  box-shadow: 0 0 0 0.1rem rgba(13, 110, 253, 0.25);
+}
+
+/* Мобильная раскладка формы (< 576 px): иконка указателя + поле занимают
+   строку, кнопка уходит на отдельную строку на всю ширину.
+   От 576 px и выше — обычная однострочная input-group. */
+@media (max-width: 575.98px) {
+  .search-placeholder {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  /* Мельче шрифт поля (и плейсхолдера наследует от него) */
+  .search-placeholder .form-control {
+    font-size: 1rem;
+  }
+
+  /* Bootstrap срезает радиусы у «средних» и «первого» детей группы
+     (специфичность :not-chain выше наших классов) — возвращаем их явно */
+  .search-placeholder .form-control {
+    border-top-right-radius: var(--bs-border-radius-lg) !important;
+    border-bottom-right-radius: var(--bs-border-radius-lg) !important;
+  }
+
+  .search-placeholder .btn {
+    flex: 0 0 100%;
+    margin-left: 0;
+    border-top-left-radius: var(--bs-border-radius-lg) !important;
+    border-bottom-left-radius: var(--bs-border-radius-lg) !important;
+    border-top-right-radius: var(--bs-border-radius-lg) !important;
+    border-bottom-right-radius: var(--bs-border-radius-lg) !important;
+  }
+}
+
+/* Степпер в герой-блоке */
+.stepper-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: #eef0f4;
+  color: #5c6b7a;
+  font-weight: 600;
+}
+
+.stepper-num.active {
+  background-color: #ffc107;
+  color: #132437;
+}
+
+.stepper-line {
+  width: 2rem;
+  height: 2px;
+  background-color: #d8dce3;
+}
+
+/* Карточки шагов под герой-блоком: ширина совпадает с hero-panel */
+.steps-inner {
+  max-width: 60rem;
+  margin: 0 auto;
+}
+
+.step-card {
+  border: 0;
+  border-radius: 1rem;
+  box-shadow: 0 0.35rem 1rem rgba(19, 36, 55, 0.06);
+}
+
+.step-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background-color: #fff6df;
+  color: #b8860b;
+  font-size: 1.4rem;
+}
+
+.step-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #8a97a5;
+}
+
+.step-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.step-desc {
+  color: #6b7885;
+}
+
+/* 768–991 px: иконка над текстом, чтобы оставаться компактными */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .step-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Подвал */
+.app-footer {
+  background-color: #fff;
+  border-top: 1px solid #e5e8ee;
 }

@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Рабочие материалы (не для репозитория)
+_plan.md
+_screen.png
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
