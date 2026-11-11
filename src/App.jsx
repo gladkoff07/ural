@@ -1,6 +1,12 @@
+import { useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import SearchForm from "./components/SearchForm.jsx"
-import { fetchBrands } from "./store/partsSlice.js"
+import {
+  clearBrandSelection,
+  fetchAnalogues,
+  fetchBrands,
+  selectBrand,
+} from "./store/partsSlice.js"
 
 // warehouses[].price приоритетнее устаревшего price
 function getMinPrice(item) {
@@ -18,6 +24,16 @@ function getMinPrice(item) {
   return prices.length ? Math.min(...prices) : null
 }
 
+// Суммарный остаток по складам
+function getTotalStock(item) {
+  if (!Array.isArray(item.warehouses)) return 0
+  return item.warehouses.reduce(
+    (sum, warehouse) =>
+      sum + (typeof warehouse.stock === "number" ? warehouse.stock : 0),
+    0,
+  )
+}
+
 function formatPrice(value) {
   return value === null ? "—" : `${value.toLocaleString("ru-RU")} ₽`
 }
@@ -29,9 +45,50 @@ function App() {
   const brandsStatus = useSelector((state) => state.parts.brandsStatus)
   const brandsError = useSelector((state) => state.parts.brandsError)
   const lastQuery = useSelector((state) => state.parts.lastQuery)
+  const selectedBrand = useSelector((state) => state.parts.selectedBrand)
+  const original = useSelector((state) => state.parts.original)
+  const analogues = useSelector((state) => state.parts.analogues)
+  const resultsStatus = useSelector((state) => state.parts.resultsStatus)
+  const resultsError = useSelector((state) => state.parts.resultsError)
 
   const handleSearch = (number) => {
     dispatch(fetchBrands({ number, apiKey }))
+  }
+
+  const handleBrandClick = (item) => {
+    const isSelected =
+      selectedBrand &&
+      selectedBrand.brand === item.brand &&
+      selectedBrand.number === item.number
+    // повторный клик свернуть аккордеон
+    if (isSelected) {
+      handleBack()
+      return
+    }
+    dispatch(selectBrand(item))
+    dispatch(fetchAnalogues({ number: item.number, brand: item.brand, apiKey }))
+  }
+
+  // стор очищается после завершения transition
+  const closeTimerRef = useRef(null)
+  const [closingRowKey, setClosingRowKey] = useState(null)
+
+  const handleBack = () => {
+    if (!selectedBrand) return
+    const index = brands.findIndex(
+      (b) =>
+        b.brand === selectedBrand.brand && b.number === selectedBrand.number,
+    )
+    if (index !== -1) {
+      setClosingRowKey(
+        `${selectedBrand.brand}-${selectedBrand.number}-${index}`,
+      )
+    }
+    clearTimeout(closeTimerRef.current)
+    closeTimerRef.current = setTimeout(() => {
+      dispatch(clearBrandSelection())
+      setClosingRowKey(null)
+    }, 350)
   }
 
   return (
@@ -109,30 +166,141 @@ function App() {
             )}
 
             {brandsStatus === "succeeded" && (
-              <div className='result-panel p-4'>
+              <div className='result-panel p-4 mb-4'>
                 <h2 className='h5 fw-semibold mb-3'>
                   Производители по артикулу{" "}
                   <span className='text-warning'>«{lastQuery}»</span>
                 </h2>
-                <div className='table-responsive'>
-                  <table className='table align-middle'>
-                    <thead>
-                      <tr>
-                        <th scope='col'>Производитель</th>
-                        <th scope='col'>Номер</th>
-                        <th scope='col'>Цена</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {brands.map((item, index) => (
-                        <tr key={`${item.brand}-${item.number}-${index}`}>
-                          <td>{item.brand}</td>
-                          <td>{item.number}</td>
-                          <td>{formatPrice(getMinPrice(item))}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+
+                <div
+                  className='brand-head d-none d-sm-grid'
+                  aria-hidden='true'
+                >
+                  <span>Производитель</span>
+                  <span>Номер</span>
+                  <span>Цена</span>
+                  <span />
+                </div>
+
+                <div className='brands-list'>
+                  {brands.map((item, index) => {
+                    const rowKey = `${item.brand}-${item.number}-${index}`
+                    const isSelected =
+                      selectedBrand &&
+                      selectedBrand.brand === item.brand &&
+                      selectedBrand.number === item.number
+                    // контент остаётся в DOM во время анимации закрытия
+                    const showContent =
+                      isSelected || (selectedBrand && closingRowKey === rowKey)
+                    return (
+                      <div
+                        className='brand-item'
+                        key={rowKey}
+                      >
+                        <button
+                          type='button'
+                          className={`brand-row ${isSelected ? "active" : ""}`}
+                          onClick={() =>
+                            isSelected ? handleBack() : handleBrandClick(item)
+                          }
+                          aria-expanded={isSelected}
+                        >
+                          <span className='fw-semibold'>{item.brand}</span>
+                          <span>{item.number}</span>
+                          <span>{formatPrice(getMinPrice(item))}</span>
+                          <i
+                            className={`bi ${
+                              isSelected ? "bi-chevron-up" : "bi-chevron-down"
+                            } chevron`}
+                          />
+                        </button>
+                        <div
+                          className={`analogues-collapse ${
+                            isSelected ? "open" : ""
+                          }`}
+                        >
+                          <div className='analogues-inner'>
+                            {showContent && selectedBrand && (
+                              <div className='p-3'>
+                                <div className='d-flex justify-content-between align-items-center mb-2'>
+                                  <span className='fw-bold'>
+                                    Аналоги и предложения:{" "}
+                                    <span className='text-warning'>
+                                      {selectedBrand.brand}
+                                    </span>{" "}
+                                    <span className='text-muted'>
+                                      ({selectedBrand.number})
+                                    </span>
+                                  </span>
+                                  <button
+                                    type='button'
+                                    className='btn-close'
+                                    aria-label='Закрыть'
+                                    onClick={handleBack}
+                                  />
+                                </div>
+
+                                {resultsStatus === "loading" && (
+                                  <p className='text-center text-muted py-3 mb-0'>
+                                    Загрузка аналогов…
+                                  </p>
+                                )}
+
+                                {resultsStatus === "failed" && (
+                                  <div
+                                    className='alert alert-danger mb-0'
+                                    role='alert'
+                                  >
+                                    {resultsError}
+                                  </div>
+                                )}
+
+                                {resultsStatus === "succeeded" &&
+                                  (original.length || analogues.length ? (
+                                    <div className='table-responsive'>
+                                      <table className='table align-middle mb-0'>
+                                        <thead>
+                                          <tr>
+                                            <th scope='col'>Название</th>
+                                            <th scope='col'>Производитель</th>
+                                            <th scope='col'>Цена</th>
+                                            <th scope='col'>Остаток</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {original
+                                            .concat(analogues)
+                                            .map((analogItem, analogIndex) => (
+                                              <tr
+                                                key={`${analogItem.brand}-${analogItem.number}-${analogItem.name}-${analogIndex}`}
+                                              >
+                                                <td>{analogItem.name}</td>
+                                                <td>{analogItem.brand}</td>
+                                                <td>
+                                                  {formatPrice(
+                                                    getMinPrice(analogItem),
+                                                  )}
+                                                </td>
+                                                <td>
+                                                  {getTotalStock(analogItem)}
+                                                </td>
+                                              </tr>
+                                            ))}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  ) : (
+                                    <p className='text-muted mb-0'>
+                                      Аналогов не найдено.
+                                    </p>
+                                  ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}

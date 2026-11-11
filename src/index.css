@@ -173,6 +173,109 @@ body {
   margin: 0 auto;
 }
 
+/* Если в таблице одна строка — без закрывающей границы */
+.result-panel .table tbody tr:only-child > td {
+  border-bottom-width: 0;
+}
+
+/* Название не растягивается на всю ширину */
+.result-panel .table td:first-child {
+  width: 41.5%;
+}
+
+/* Цена не переносится */
+.result-panel .table td:nth-child(3) {
+  white-space: nowrap;
+}
+
+/* Цена в строке бренда не переносится */
+.brand-row span:nth-child(3) {
+  white-space: nowrap;
+}
+
+/* Заголовки таблиц — заметнее дефолтных Bootstrap */
+.result-panel .table th {
+  font-weight: 600;
+}
+
+/* Аккордеон брендов: строка + раскрывающийся блок аналогов */
+.brand-item {
+  border-bottom: 1px solid #eef0f4;
+}
+
+.brand-item:last-child {
+  border-bottom: none;
+}
+
+.brand-head,
+.brand-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 2rem;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.brand-head {
+  padding: 0 0.75rem 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #8a97a5;
+}
+
+.brand-row {
+  width: 100%;
+  border: 0;
+  background: none;
+  text-align: left;
+  padding: 0.8rem 0.75rem;
+  color: #212529;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.brand-row:hover,
+.brand-row.active {
+  background-color: #fff8e1;
+}
+
+.brand-row .chevron {
+  color: #8a97a5;
+  transition: transform 0.25s ease;
+}
+
+.brand-row.active .chevron {
+  transform: rotate(180deg);
+}
+
+/* Плавное раскрытие через grid-template-rows: 0fr -> 1fr */
+.analogues-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+
+.analogues-collapse.open {
+  grid-template-rows: 1fr;
+}
+
+.analogues-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+@media (max-width: 575.98px) {
+  .brand-head {
+    display: none;
+  }
+
+  .brand-row {
+    padding: 0.7rem 0.5rem;
+    font-size: 0.92rem;
+  }
+}
+
 .step-card {
   border: 0;
   border-radius: 1rem;
