@@ -1,35 +1,16 @@
 import { useRef, useState } from "react"
-import { DEMO_API_KEY, searchByNumber } from "../api/favoritParts.js"
 
 const EXAMPLES = ["0189", "01089", "OC90", "W712/73"]
-const TEMP_API_KEY = import.meta.env.VITE_API_KEY || DEMO_API_KEY
 
 function SearchForm({ onSearch }) {
   const [number, setNumber] = useState("")
   const inputRef = useRef(null)
-  const abortRef = useRef(null)
 
   const handleSubmit = (event) => {
     event.preventDefault()
     const value = number.trim()
     if (!value) return
     onSearch(value)
-
-    // Временный запрос для проверки сети
-    abortRef.current?.abort()
-    abortRef.current = new AbortController()
-    searchByNumber({
-      apiKey: TEMP_API_KEY,
-      number: value,
-      signal: abortRef.current.signal,
-    })
-      .then((goods) => {
-        console.log(`Ответ Favorit Parts по «${value}»:`, goods)
-      })
-      .catch((error) => {
-        if (error.name === "AbortError") return // отмену не считаем сбоем
-        console.warn(`Ошибка запроса по «${value}»:`, error.message)
-      })
 
     // Поле очищается и возвращает фокус сразу после отправки запроса
     setNumber("")

@@ -164,6 +164,15 @@ body {
   margin: 0 auto;
 }
 
+/* Результаты поиска (простая версия шага 5) */
+.result-panel {
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 0.35rem 1rem rgba(19, 36, 55, 0.06);
+  max-width: 60rem;
+  margin: 0 auto;
+}
+
 .step-card {
   border: 0;
   border-radius: 1rem;
