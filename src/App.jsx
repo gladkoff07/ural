@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import SearchForm from "./components/SearchForm.jsx"
 import Loader from "./components/Loader.jsx"
@@ -31,9 +31,52 @@ function App() {
     if (input) input.focus()
   }
 
-  const handleSearch = (number) => {
-    dispatch(fetchBrands({ number, apiKey }))
+  // новый поиск отменяет предыдущий
+  const brandsAbortRef = useRef(null)
+  const analoguesAbortRef = useRef(null)
+
+  const startSearch = (number) => {
+    brandsAbortRef.current?.abort()
+    const controller = new AbortController()
+    brandsAbortRef.current = controller
+    dispatch(fetchBrands({ number, apiKey, signal: controller.signal }))
   }
+
+  const startAnalogues = (brand) => {
+    analoguesAbortRef.current?.abort()
+    const controller = new AbortController()
+    analoguesAbortRef.current = controller
+    dispatch(
+      fetchAnalogues({
+        number: brand.number,
+        brand: brand.brand,
+        apiKey,
+        signal: controller.signal,
+      }),
+    )
+  }
+
+  // отмена запросов при размонтировании
+  useEffect(
+    () => () => {
+      brandsAbortRef.current?.abort()
+      analoguesAbortRef.current?.abort()
+    },
+    [],
+  )
+
+  // плавный скролл к результатам после поиска
+  const resultsRef = useRef(null)
+  useEffect(() => {
+    if (brandsStatus === "succeeded") {
+      resultsRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      })
+    }
+  }, [brandsStatus])
+
+  const handleSearch = startSearch
 
   const handleBrandClick = (item) => {
     const isSelected =
@@ -46,7 +89,7 @@ function App() {
       return
     }
     dispatch(selectBrand(item))
-    dispatch(fetchAnalogues({ number: item.number, brand: item.brand, apiKey }))
+    startAnalogues(item)
   }
 
   // стор очищается после завершения transition
@@ -138,7 +181,10 @@ function App() {
         </section>
 
         {/* Результаты поиска*/}
-        <section className='results pb-5'>
+        <section
+          className='results pb-5'
+          ref={resultsRef}
+        >
           <div className='container'>
             {brandsStatus === "loading" && (
               <Loader
@@ -154,9 +200,7 @@ function App() {
             {brandsStatus === "failed" && (
               <ErrorAlert
                 error={brandsError}
-                onRetry={() =>
-                  dispatch(fetchBrands({ number: lastQuery, apiKey }))
-                }
+                onRetry={() => startSearch(lastQuery)}
               />
             )}
 
@@ -257,15 +301,7 @@ function App() {
                                 {resultsStatus === "failed" && (
                                   <ErrorAlert
                                     error={resultsError}
-                                    onRetry={() =>
-                                      dispatch(
-                                        fetchAnalogues({
-                                          number: selectedBrand.number,
-                                          brand: selectedBrand.brand,
-                                          apiKey,
-                                        }),
-                                      )
-                                    }
+                                    onRetry={() => startAnalogues(selectedBrand)}
                                   />
                                 )}
 

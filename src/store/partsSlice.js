@@ -139,7 +139,7 @@ const partsSlice = createSlice({
         state.resultsError = null
       })
       .addCase(fetchBrands.rejected, (state, action) => {
-        if (action.error?.name === 'AbortError') return // отмена — не сбой
+        if (action.meta.aborted || action.error?.name === 'AbortError') return // отмена — не сбой
         state.brandsStatus = 'failed'
         state.brandsError =
           action.payload ?? action.error?.message ?? 'Неизвестная ошибка'
@@ -154,7 +154,7 @@ const partsSlice = createSlice({
         state.analogues = action.payload.analogues
       })
       .addCase(fetchAnalogues.rejected, (state, action) => {
-        if (action.error?.name === 'AbortError') return // отмена — не сбой
+        if (action.meta.aborted || action.error?.name === 'AbortError') return // отмена — не сбой
         state.resultsStatus = 'failed'
         state.resultsError =
           action.payload ?? action.error?.message ?? 'Неизвестная ошибка'
