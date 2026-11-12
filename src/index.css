@@ -323,3 +323,22 @@ body {
   background-color: #fff;
   border-top: 1px solid #e5e8ee;
 }
+
+/* Состояния: загрузка / ошибка / пустой результат */
+.state-block .spinner-border {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-width: 3px;
+}
+
+.state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: #fff8e1;
+  color: #b58900;
+  font-size: 1.25rem;
+}

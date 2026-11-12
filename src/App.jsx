@@ -1,6 +1,9 @@
 import { useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import SearchForm from "./components/SearchForm.jsx"
+import Loader from "./components/Loader.jsx"
+import ErrorAlert from "./components/ErrorAlert.jsx"
+import EmptyState from "./components/EmptyState.jsx"
 import {
   clearBrandSelection,
   fetchAnalogues,
@@ -50,6 +53,12 @@ function App() {
   const analogues = useSelector((state) => state.parts.analogues)
   const resultsStatus = useSelector((state) => state.parts.resultsStatus)
   const resultsError = useSelector((state) => state.parts.resultsError)
+
+  const handleFocusSearch = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+    const input = document.querySelector(".search-placeholder .form-control")
+    if (input) input.focus()
+  }
 
   const handleSearch = (number) => {
     dispatch(fetchBrands({ number, apiKey }))
@@ -153,15 +162,33 @@ function App() {
         <section className='results pb-5'>
           <div className='container'>
             {brandsStatus === "loading" && (
-              <p className='text-center text-muted py-4 mb-0'>Загрузка…</p>
+              <Loader
+                title='Ищем производителей'
+                subtitle={
+                  lastQuery
+                    ? `По артикулу «${lastQuery}»…`
+                    : "Это займёт несколько секунд…"
+                }
+              />
             )}
 
             {brandsStatus === "failed" && (
-              <div
-                className='alert alert-danger'
-                role='alert'
-              >
-                {brandsError}
+              <ErrorAlert
+                error={brandsError}
+                onRetry={() =>
+                  dispatch(fetchBrands({ number: lastQuery, apiKey }))
+                }
+              />
+            )}
+
+            {brandsStatus === "succeeded" && !brands.length && (
+              <div className='result-panel p-4 mb-4'>
+                <EmptyState
+                  title='Ничего не найдено'
+                  description={`По артикулу «${lastQuery}» производители не найдены. Проверьте номер и попробуйте ещё раз.`}
+                  actionLabel='Новый поиск'
+                  onAction={handleFocusSearch}
+                />
               </div>
             )}
 
@@ -241,18 +268,26 @@ function App() {
                                 </div>
 
                                 {resultsStatus === "loading" && (
-                                  <p className='text-center text-muted py-3 mb-0'>
-                                    Загрузка аналогов…
-                                  </p>
+                                  <Loader
+                                    compact
+                                    title='Загружаем аналоги'
+                                    subtitle={`${selectedBrand.brand} (${selectedBrand.number})`}
+                                  />
                                 )}
 
                                 {resultsStatus === "failed" && (
-                                  <div
-                                    className='alert alert-danger mb-0'
-                                    role='alert'
-                                  >
-                                    {resultsError}
-                                  </div>
+                                  <ErrorAlert
+                                    error={resultsError}
+                                    onRetry={() =>
+                                      dispatch(
+                                        fetchAnalogues({
+                                          number: selectedBrand.number,
+                                          brand: selectedBrand.brand,
+                                          apiKey,
+                                        }),
+                                      )
+                                    }
+                                  />
                                 )}
 
                                 {resultsStatus === "succeeded" &&
@@ -290,9 +325,11 @@ function App() {
                                       </table>
                                     </div>
                                   ) : (
-                                    <p className='text-muted mb-0'>
-                                      Аналогов не найдено.
-                                    </p>
+                                    <EmptyState
+                                      compact
+                                      title='Аналогов не найдено'
+                                      description='Для этой позиции в базе нет предложений.'
+                                    />
                                   ))}
                               </div>
                             )}
