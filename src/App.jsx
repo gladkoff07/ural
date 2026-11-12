@@ -10,11 +10,7 @@ import {
   fetchBrands,
   selectBrand,
 } from "./store/partsSlice.js"
-
-// Цены форматируются одинаково по всей вёрстке (переедет в utils/format.js на шаге 9)
-function formatPrice(value) {
-  return value === null ? "—" : `${value.toLocaleString("ru-RU")} ₽`
-}
+import { formatNumber, formatPrice } from "./utils/format.js"
 
 function App() {
   const dispatch = useDispatch()
@@ -114,7 +110,11 @@ function App() {
 
               <div className='stepper d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 mt-4 pt-2'>
                 <div className='d-flex align-items-center gap-3'>
-                  <span className='stepper-num active'>1</span>
+                  <span
+                    className={`stepper-num ${selectedBrand ? "" : "active"}`}
+                  >
+                    1
+                  </span>
                   <div>
                     <div className='fw-semibold'>Поиск производителя</div>
                     <div className='text-muted small'>Артикул → бренды</div>
@@ -122,7 +122,11 @@ function App() {
                 </div>
                 <span className='stepper-line d-none d-md-block' />
                 <div className='d-flex align-items-center gap-3'>
-                  <span className='stepper-num'>2</span>
+                  <span
+                    className={`stepper-num ${selectedBrand ? "active" : ""}`}
+                  >
+                    2
+                  </span>
                   <div>
                     <div className='fw-semibold'>Аналоги и предложения</div>
                     <div className='text-muted small'>Цены и остатки</div>
@@ -292,7 +296,9 @@ function App() {
                                                   )}
                                                 </td>
                                                 <td>
-                                                  {analogItem.totalStock}
+                                                  {formatNumber(
+                                                    analogItem.totalStock,
+                                                  )}
                                                 </td>
                                               </tr>
                                             ))}
