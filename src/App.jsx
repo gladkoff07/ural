@@ -11,32 +11,7 @@ import {
   selectBrand,
 } from "./store/partsSlice.js"
 
-// warehouses[].price приоритетнее устаревшего price
-function getMinPrice(item) {
-  const prices = []
-  if (typeof item.price === "number" && item.price > 0) {
-    prices.push(item.price)
-  }
-  if (Array.isArray(item.warehouses)) {
-    item.warehouses.forEach((warehouse) => {
-      if (typeof warehouse.price === "number" && warehouse.price > 0) {
-        prices.push(warehouse.price)
-      }
-    })
-  }
-  return prices.length ? Math.min(...prices) : null
-}
-
-// Суммарный остаток по складам
-function getTotalStock(item) {
-  if (!Array.isArray(item.warehouses)) return 0
-  return item.warehouses.reduce(
-    (sum, warehouse) =>
-      sum + (typeof warehouse.stock === "number" ? warehouse.stock : 0),
-    0,
-  )
-}
-
+// Цены форматируются одинаково по всей вёрстке (переедет в utils/format.js на шаге 9)
 function formatPrice(value) {
   return value === null ? "—" : `${value.toLocaleString("ru-RU")} ₽`
 }
@@ -234,7 +209,7 @@ function App() {
                         >
                           <span className='fw-semibold'>{item.brand}</span>
                           <span>{item.number}</span>
-                          <span>{formatPrice(getMinPrice(item))}</span>
+                          <span>{formatPrice(item.minPrice)}</span>
                           <i
                             className={`bi ${
                               isSelected ? "bi-chevron-up" : "bi-chevron-down"
@@ -313,11 +288,11 @@ function App() {
                                                 <td>{analogItem.brand}</td>
                                                 <td>
                                                   {formatPrice(
-                                                    getMinPrice(analogItem),
+                                                    analogItem.minPrice,
                                                   )}
                                                 </td>
                                                 <td>
-                                                  {getTotalStock(analogItem)}
+                                                  {analogItem.totalStock}
                                                 </td>
                                               </tr>
                                             ))}

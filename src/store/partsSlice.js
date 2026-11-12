@@ -8,6 +8,11 @@ import {
   searchAnalogues,
   searchByNumber,
 } from '../api/favoritParts.js'
+import {
+  aggregateBrands,
+  isEmptyGoods,
+  normalizeResults,
+} from '../utils/parts.js'
 
 const API_KEY_STORAGE = 'favorit-parts-api-key'
 
@@ -44,7 +49,10 @@ export const fetchBrands = createAsyncThunk(
   async ({ number, apiKey, signal }, { rejectWithValue }) => {
     try {
       const goods = await searchByNumber({ apiKey, number, signal })
-      return { number, goods }
+      return {
+        number,
+        brands: isEmptyGoods(goods) ? [] : aggregateBrands(goods),
+      }
     } catch (error) {
       if (error.name === 'AbortError') {
         throw error // отмену не считаем сбоем
@@ -63,7 +71,9 @@ export const fetchAnalogues = createAsyncThunk(
   async ({ number, brand, apiKey, signal }, { rejectWithValue }) => {
     try {
       const goods = await searchAnalogues({ apiKey, number, brand, signal })
-      return goods
+      return isEmptyGoods(goods)
+        ? { originals: [], analogues: [] }
+        : normalizeResults(goods)
     } catch (error) {
       if (error.name === 'AbortError') {
         throw error // отмену не считаем сбоем
@@ -119,7 +129,7 @@ const partsSlice = createSlice({
       })
       .addCase(fetchBrands.fulfilled, (state, action) => {
         state.brandsStatus = 'succeeded'
-        state.brands = action.payload.goods
+        state.brands = action.payload.brands
         state.lastQuery = action.payload.number
 
         state.selectedBrand = null
@@ -140,13 +150,8 @@ const partsSlice = createSlice({
       })
       .addCase(fetchAnalogues.fulfilled, (state, action) => {
         state.resultsStatus = 'succeeded'
-        const selected = state.selectedBrand
-        const isOriginal = (item) =>
-          selected &&
-          item.brand === selected.brand &&
-          item.number === selected.number
-        state.original = action.payload.filter((item) => isOriginal(item))
-        state.analogues = action.payload.filter((item) => !isOriginal(item))
+        state.original = action.payload.originals
+        state.analogues = action.payload.analogues
       })
       .addCase(fetchAnalogues.rejected, (state, action) => {
         if (action.error?.name === 'AbortError') return // отмена — не сбой

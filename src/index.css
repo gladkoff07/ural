@@ -173,8 +173,8 @@ body {
   margin: 0 auto;
 }
 
-/* Если в таблице одна строка — без закрывающей границы */
-.result-panel .table tbody tr:only-child > td {
+/* У последней строки (и единственной) — без нижней границы */
+.result-panel .table tbody tr:last-child > td {
   border-bottom-width: 0;
 }
 
