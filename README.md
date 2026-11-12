@@ -1,16 +1,33 @@
-# React + Vite
+Клиентское приложение на React для интеграции с внешним API-сервисом поиска автозапчастей и аналогов
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Стек
 
-Currently, two official plugins are available:
+- React 18 + Redux Toolkit (`createAsyncThunk`, слайсы)
+- Bootstrap 5 + Bootstrap Icons
+- Vite
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Как работает
 
-## React Compiler
+1. **Этап 1.** Вводится артикул (например `0189`, `01089`, `W712/73`) → запрос к API → список
+   производителей с номером и минимальной ценой. Клик по производителю раскрывает аккордеон.
+2. **Этап 2.** Запрос аналогов по паре «номер + бренд» → таблица: название, производитель,
+   цена, остаток на складах.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Обработка состояний: спиннеры этапов (`Loader`), понятные ошибки API с кнопкой "Повторить"
+(`ErrorAlert`), "ничего не найдено" (`EmptyState`). Ответы API (массив с пустыми
+объектами) трактуется как отсутствие результатов. Новые запросы отменяют предыдущие
+(`AbortController`), отменённый запрос не считается ошибкой.
 
-## Expanding the ESLint configuration
+## Быстрый старт
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev      # http://localhost:5173
+```
+
+## Сборка
+
+```bash
+npm run build    # dist/
+npm run preview  # локальный просмотр собранной версии
+```
