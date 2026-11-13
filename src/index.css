@@ -10,7 +10,8 @@ body {
 }
 
 .app-header {
-  background-color: #132437;
+  background: linear-gradient(120deg, #0a1826 0%, #102b43 100%);
+  box-shadow: 0 6px 24px rgba(4, 16, 28, 0.18);
   color: #fff;
 }
 
@@ -47,11 +48,20 @@ body {
 }
 
 .hero-panel {
+  position: relative;
+  overflow: hidden;
   background-color: #fff;
   border-radius: 1rem;
   box-shadow: 0 0.5rem 1.5rem rgba(19, 36, 55, 0.08);
-  max-width: 60rem;
-  margin: 0 auto;
+}
+
+/* Жёлтая градиентная полоса сверху панели */
+.hero-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5px;
+  background: linear-gradient(90deg, rgb(255, 193, 7), #ffd166 45%, transparent 92%);
 }
 
 .hero-badge {
@@ -64,6 +74,24 @@ body {
 
 .search-placeholder {
   max-width: 40rem;
+}
+
+/* Фокус: рамка вокруг иконки и поля (без кнопки), а не всего блока */
+.search-placeholder .form-control:focus,
+.search-placeholder .form-control:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.search-placeholder:focus-within .input-group-text,
+.search-placeholder:focus-within .form-control {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.1rem rgba(13, 110, 253, 0.25);
+}
+
+/* У иконки та же плавная анимация подсветки, что у поля */
+.search-placeholder .input-group-text {
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 @media (min-width: 576px) {
@@ -159,18 +187,11 @@ body {
   background-color: #d8dce3;
 }
 
-.steps-inner {
-  max-width: 60rem;
-  margin: 0 auto;
-}
-
 /* Результаты поиска (простая версия шага 5) */
 .result-panel {
   background-color: #fff;
   border-radius: 1rem;
   box-shadow: 0 0.35rem 1rem rgba(19, 36, 55, 0.06);
-  max-width: 60rem;
-  margin: 0 auto;
 }
 
 /* У последней строки (и единственной) — без нижней границы */
